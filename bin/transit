@@ -1,0 +1,13 @@
+#!/usr/bin/env node
+
+var API = require('../src/api').API,
+	api = new API("mbta");
+
+
+/* api.routeList().then(function(routes) {
+	console.log(routes);
+}); */
+
+api.predictions("23151").then(function(config) {
+	console.log(config);
+});

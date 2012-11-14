@@ -1,0 +1,28 @@
+{
+  "author": "John Roepke <john@justjohn.us> (http://john.sh/)",
+  "name": "console-transit",
+  "description": "A console client for getting transit information.",
+  "version": "0.0.1",
+  "homepage": "https://github.com/justjohn/console-transit",
+  "licenses": [
+    { "type": "BSD-2-Clause",
+      "url":  "https://raw.github.com/justjohn/console-transit/master/LICENSE" }
+  ],
+  "repository": {
+    "type": "git",
+    "url":  "git://github.com/justjohn/console-transit.git"
+  },
+  "dependencies": {
+    "q": "0.8.x",
+    "xml2object": "0.1.x",
+    "cli-color": "0.2.x"
+  },
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "engines": {
+    "node": "*"
+  },
+  "bin": {
+    "transit" : "./bin/transit"
+  }
+}
