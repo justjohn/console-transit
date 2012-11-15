@@ -1,13 +1,31 @@
 #!/usr/bin/env node
 
-var API = require('../src/api').API,
-	api = new API("mbta");
+var NextBus = require('../src/raw/nextbus').NextBus,
+	MBTA = require('../src/raw/mbta').MBTA,
+	nextBus = new NextBus("mbta");
 
 
-/* api.routeList().then(function(routes) {
+/* nextBus.routeList().then(function(routes) {
 	console.log(routes);
 }); */
 
-api.predictions("23151").then(function(config) {
+/* nextBus.predictions("23151").then(function(config) {
 	console.log(config);
+}); */
+
+
+
+var mbta = new MBTA();
+
+mbta.subways().then(function(data) {
+	console.log(data);
 });
+
+mbta.subway('Red').then(function(data) {
+	console.log(data);
+});
+
+/* mbta.platforms().then(function(data) {
+	console.log(data);
+}); */
+
