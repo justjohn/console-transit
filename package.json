@@ -14,8 +14,10 @@
   },
   "dependencies": {
     "q": "0.8.x",
-    "xml2object": "0.1.x",
-    "cli-color": "0.2.x"
+    "cli-color": "0.2.x",
+    "transit-api": "latest",
+    "string-utils": "latest",
+    "underscore": "latest"
   },
   "devDependencies": {},
   "optionalDependencies": {},

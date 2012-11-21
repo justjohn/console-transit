@@ -1,31 +1,94 @@
 #!/usr/bin/env node
+var Q = require("q"),
+	_ = require("underscore"),
+    utils = require("string-utils"),
+	MBTA = require("transit-api").MBTA,
+    mbta = new MBTA(),
+	args = Array.prototype.slice.apply(process.argv),
+    line,
+    length = 40;
 
-var NextBus = require('../src/raw/nextbus').NextBus,
-	MBTA = require('../src/raw/mbta').MBTA,
-	nextBus = new NextBus("mbta");
+// trim node and weather off
+args.shift();
+args.shift();
+
+line = args.shift() || "Red";
+
+var tasks = {};
+
+tasks.lookup = function(name) {
+	return mbta.lines().then(function(lines) {
+		var deferred = Q.defer();
+		var subway, i;
+		for (i=0;i<lines.length;i++) {
+			subway = lines[i];
+			if (subway.toLowerCase() == name.toLowerCase())
+				return subway;
+		}
+		throw new Error("Can't find route");
+	});
+};
 
 
-/* nextBus.routeList().then(function(routes) {
-	console.log(routes);
-}); */
+tasks.data = function(match) {
+	return mbta.subways(match)
+};
+tasks.parseData = function(subway) {
+	var sorted = _.sortBy(subway, function(item) {
+		return parseInt(item.PlatformOrder, 10);
+	});
+	var grouped = _.groupBy(sorted, function(item) {
+		return item.Direction;
+	});
+	return grouped;
+};
 
-/* nextBus.predictions("23151").then(function(config) {
-	console.log(config);
-}); */
+tasks.predictions = function(line) {
+	return mbta.predictions(line);
+};
+tasks.parsePredictions = function(predictions) {
+	var byPlatformKey = _.groupBy(predictions, function(data) {
+		return data.PlatformKey;
+	});
+	return byPlatformKey;
+};
 
+var subwayLookup = tasks.lookup(line);
 
+var subwayData = subwayLookup
+	.then(tasks.data)
+	.then(tasks.parseData);
 
-var mbta = new MBTA();
+var subwayPredictions = subwayLookup
+	.then(tasks.predictions)
+	.then(tasks.parsePredictions);
 
-mbta.subways().then(function(data) {
-	console.log(data);
+Q.spread([subwayData, subwayPredictions], function (data, predictions) {
+    _.each(data, function(platforms, direction) {
+    	console.log(utils.pad(" "+direction+" ", length, "-"));
+    	_.each(platforms, function(platform) {
+    		var key = platform.PlatformKey,
+    			platformPredictions = predictions[key],
+    			output = '',
+    			predictionText;
+
+    		output += platform.stop_name + ": ";
+    		var i, prediction;
+    		if (platformPredictions) for (i=0;i<platformPredictions.length;i++) {
+				prediction = platformPredictions[i];
+				if (prediction.InformationType == "Predicted") {
+					predictionText = "  " + prediction.TimeRemaining;
+					break;
+				}
+			}
+
+			if (!predictionText)
+				predictionText = "--:--:--";
+
+    		console.log(output + utils.padLeft(predictionText, " ", length-output.length));
+    	});
+    })
+})
+.fail(function(err) {
+	console.log(err);
 });
-
-mbta.subway('Red').then(function(data) {
-	console.log(data);
-});
-
-/* mbta.platforms().then(function(data) {
-	console.log(data);
-}); */
-
