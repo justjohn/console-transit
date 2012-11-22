@@ -64,29 +64,34 @@ var subwayPredictions = subwayLookup
 	.then(tasks.parsePredictions);
 
 Q.spread([subwayData, subwayPredictions], function (data, predictions) {
-    _.each(data, function(platforms, direction) {
-    	console.log(utils.pad(" "+direction+" ", length, "-"));
-    	_.each(platforms, function(platform) {
-    		var key = platform.PlatformKey,
-    			platformPredictions = predictions[key],
-    			output = '',
-    			predictionText;
+	_.each(data, function(platforms, direction) {
+		console.log(utils.pad(" "+direction+" ", length, "-"));
+		_.each(platforms, function(platform) {
+			var key = platform.PlatformKey,
+				stop = platform.stop_name,
+				platformPredictions = predictions[key],
+				output = '',
+				time,
+				predictionText;
 
-    		output += platform.stop_name + ": ";
-    		var i, prediction;
-    		if (platformPredictions) for (i=0;i<platformPredictions.length;i++) {
+			output += stop + ": ";
+			var i, prediction;
+			if (platformPredictions) for (i=0;i<platformPredictions.length;i++) {
 				prediction = platformPredictions[i];
 				if (prediction.InformationType == "Predicted") {
-					predictionText = "  " + prediction.TimeRemaining;
+					time = prediction.TimeRemaining.split(":");
+					time.shift();
+					predictionText = "  " + time.join(":");
 					break;
 				}
 			}
 
 			if (!predictionText)
-				predictionText = "--:--:--";
+				predictionText = "--:--";
 
     		console.log(output + utils.padLeft(predictionText, " ", length-output.length));
     	});
+    	console.log("");
     })
 })
 .fail(function(err) {
