@@ -19,12 +19,15 @@ var tasks = {};
 tasks.lookup = function(name) {
 	return mbta.lines().then(function(lines) {
 		var deferred = Q.defer();
-		var subway, i;
-		for (i=0;i<lines.length;i++) {
-			subway = lines[i];
-			if (subway.toLowerCase() == name.toLowerCase())
+
+		for (var i=0;i<lines.length;i++) {
+			var subway = lines[i].tag;
+
+			if (subway.toLowerCase() == name.toLowerCase()) {
 				return subway;
+			}
 		}
+
 		throw new Error("Can't find route");
 	});
 };
@@ -33,6 +36,7 @@ tasks.lookup = function(name) {
 tasks.data = function(match) {
 	return mbta.subways(match)
 };
+
 tasks.parseData = function(subway) {
 	var sorted = _.sortBy(subway, function(item) {
 		return parseInt(item.PlatformOrder, 10);
@@ -46,6 +50,7 @@ tasks.parseData = function(subway) {
 tasks.predictions = function(line) {
 	return mbta.predictions(line);
 };
+
 tasks.parsePredictions = function(predictions) {
 	var byPlatformKey = _.groupBy(predictions, function(data) {
 		return data.PlatformKey;
@@ -54,6 +59,7 @@ tasks.parsePredictions = function(predictions) {
 };
 
 var subwayLookup = tasks.lookup(line);
+
 
 var subwayData = subwayLookup
 	.then(tasks.data)
