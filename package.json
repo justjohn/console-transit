@@ -2,7 +2,7 @@
   "author": "John Roepke <john@justjohn.us> (http://john.sh/)",
   "name": "console-transit",
   "description": "A console client for getting transit information.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "homepage": "https://github.com/justjohn/console-transit",
   "licenses": [
     { "type": "BSD-2-Clause",
